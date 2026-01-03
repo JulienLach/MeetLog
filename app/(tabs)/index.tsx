@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -10,32 +11,33 @@ interface MeetingNote {
 }
 
 export default function Index() {
+    const router = useRouter();
     const [meetingNotes, setMeetingNotes] = useState<MeetingNote[]>([
         {
             id: "1",
             title: "Stand-up Sprint 15",
-            date: "06-02-2026",
+            date: "06/02/2026",
             summary: "Discussion sur les tâches en cours, blocages identifiés sur l'API...",
             duration: "15 min",
         },
         {
             id: "2",
             title: "Réunion planning Sprint 16",
-            date: "27-01-2026",
+            date: "27/01/2026",
             summary: "Définition des objectifs du prochain sprint, priorisation des features...",
             duration: "45 min",
         },
         {
             id: "3",
             title: "Retro Sprint 14",
-            date: "14-01-2026",
+            date: "14/01/2026",
             summary: "Analyse des points d'amélioration, célébration des réussites...",
             duration: "30 min",
         },
     ]);
 
     const renderMeetingNote = ({ item }: { item: MeetingNote }) => (
-        <TouchableOpacity style={styles.noteCard}>
+        <TouchableOpacity style={styles.noteCard} onPress={() => router.push(`/details?id=${item.id}`)}>
             <View style={styles.noteHeader}>
                 <Text style={styles.noteTitle}>{item.title}</Text>
                 <Text style={styles.noteDate}>{item.date}</Text>

@@ -8,4 +8,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
--   Basic frontend structure with login, account, and notes tabs
+-   Basic frontend structure with login, account, record and notes tabs
+-   Database connection setup
+-   Server file structure

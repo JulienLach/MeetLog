@@ -5,9 +5,9 @@ export default function Account() {
     const router = useRouter();
     // TODO: Récupérer les données utilisateur
     const userData = {
-        email: "utilisateur@example.com",
+        email: "test@gmail.com",
         notesCount: 12,
-        lastRecording: "2024-01-15",
+        lastRecording: "13/02/2026",
     };
 
     const handleLogout = () => {

@@ -14,15 +14,17 @@ export default function TabsLayout() {
                 name="index"
                 options={{
                     title: "Notes",
-                    tabBarIcon: ({ color, size }) => <Ionicons name="document-text" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => (
+                        <Ionicons name="document-text-outline" size={size} color={color} />
+                    ),
                     headerTitle: "Notes",
                 }}
             />
             <Tabs.Screen
-                name="notes"
+                name="record"
                 options={{
                     title: "Enregistrer",
-                    tabBarIcon: ({ color, size }) => <Ionicons name="mic" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="mic-outline" size={size} color={color} />,
                     headerTitle: "Enregistrer",
                 }}
             />
@@ -30,7 +32,7 @@ export default function TabsLayout() {
                 name="account"
                 options={{
                     title: "Compte",
-                    tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
                     headerTitle: "Compte",
                 }}
             />
