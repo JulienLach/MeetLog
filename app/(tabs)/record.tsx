@@ -1,11 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { createNote, createRecord } from "../lib/api";
 
 export default function Record() {
+    const router = useRouter();
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
+    const [isSaving, setIsSaving] = useState(false);
     const recordingRef = useRef<Audio.Recording | null>(null);
     const timerRef = useRef<number | null>(null);
 
@@ -36,11 +40,36 @@ export default function Record() {
                 // Arrêter l'enregistrement
                 await recordingRef.current.stopAndUnloadAsync();
                 const uri = recordingRef.current.getURI();
-                console.log("Enregistrement sauvegardé:", uri);
-                recordingRef.current = null;
+                const duration = recordingTime;
+
                 setIsRecording(false);
-                setRecordingTime(0);
                 if (timerRef.current) clearInterval(timerRef.current);
+                recordingRef.current = null;
+
+                if (!uri) {
+                    Alert.alert("Erreur", "Impossible de récupérer l'enregistrement");
+                    return;
+                }
+
+                // Sauvegarder l'enregistrement
+                setIsSaving(true);
+                try {
+                    const title = `Enregistrement ${new Date().toLocaleDateString("fr-FR")}`;
+                    const userId = 1;
+
+                    const record = await createRecord(userId, title, duration, uri);
+                    await createNote(record.id_record, userId, "Note en attente de transcription...");
+
+                    Alert.alert("Succès", "Enregistrement sauvegardé avec succès", [
+                        { text: "OK", onPress: () => router.push("/(tabs)") },
+                    ]);
+                } catch (error) {
+                    console.error("Erreur sauvegarde:", error);
+                    Alert.alert("Erreur", "Impossible de sauvegarder l'enregistrement");
+                } finally {
+                    setIsSaving(false);
+                    setRecordingTime(0);
+                }
             } else {
                 // Démarrer l'enregistrement
                 const recording = new Audio.Recording();
@@ -57,6 +86,7 @@ export default function Record() {
             }
         } catch (err) {
             console.error("Erreur lors de l'enregistrement:", err);
+            Alert.alert("Erreur", "Impossible de démarrer l'enregistrement");
         }
     };
 
@@ -65,6 +95,15 @@ export default function Record() {
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
+
+    if (isSaving) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" color="#0a7ea4" />
+                <Text style={styles.savingText}>Sauvegarde en cours...</Text>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -156,5 +195,10 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
         fontWeight: "500",
+    },
+    savingText: {
+        marginTop: 16,
+        fontSize: 16,
+        color: "#666",
     },
 });

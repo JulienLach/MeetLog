@@ -1,6 +1,7 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { getAllNotes, type Note } from "../lib/api";
 
 interface MeetingNote {
     id: string;
@@ -12,29 +13,36 @@ interface MeetingNote {
 
 export default function Index() {
     const router = useRouter();
-    const [meetingNotes, setMeetingNotes] = useState<MeetingNote[]>([
-        {
-            id: "1",
-            title: "Stand-up Sprint 15",
-            date: "06/02/2026",
-            summary: "Discussion sur les tâches en cours, blocages identifiés sur l'API...",
-            duration: "15 min",
-        },
-        {
-            id: "2",
-            title: "Réunion planning Sprint 16",
-            date: "27/01/2026",
-            summary: "Définition des objectifs du prochain sprint, priorisation des features...",
-            duration: "45 min",
-        },
-        {
-            id: "3",
-            title: "Retro Sprint 14",
-            date: "14/01/2026",
-            summary: "Analyse des points d'amélioration, célébration des réussites...",
-            duration: "30 min",
-        },
-    ]);
+    const [meetingNotes, setMeetingNotes] = useState<MeetingNote[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadNotes();
+        }, [])
+    );
+
+    const loadNotes = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const notes: Note[] = await getAllNotes(1);
+            const mappedNotes: MeetingNote[] = notes.map((note) => ({
+                id: note.id_note.toString(),
+                title: `Note ${note.id_record}`,
+                date: new Date(note.created_at).toLocaleDateString("fr-FR"),
+                summary: note.content,
+                duration: "",
+            }));
+            setMeetingNotes(mappedNotes);
+        } catch (err) {
+            setError("Erreur lors du chargement des notes");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const renderMeetingNote = ({ item }: { item: MeetingNote }) => (
         <TouchableOpacity style={styles.noteCard} onPress={() => router.push(`/details?id=${item.id}`)}>
@@ -50,6 +58,27 @@ export default function Index() {
             </View>
         </TouchableOpacity>
     );
+
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size="large" color="#0a7ea4" />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.container}>
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyText}>{error}</Text>
+                    <TouchableOpacity onPress={loadNotes} style={styles.retryButton}>
+                        <Text style={styles.retryText}>Réessayer</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -152,5 +181,17 @@ const styles = StyleSheet.create({
         color: "#999",
         textAlign: "center",
         lineHeight: 20,
+    },
+    retryButton: {
+        marginTop: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        backgroundColor: "#0a7ea4",
+        borderRadius: 8,
+    },
+    retryText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "600",
     },
 });

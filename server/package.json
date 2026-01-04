@@ -1,27 +1,31 @@
 {
-    "name": "@meetlog/api",
-    "version": "1.0.0",
-    "description": "MeetLog API Server",
-    "license": "ISC",
-    "author": "Julien",
-    "type": "module",
-    "main": "dist/server.js",
-    "scripts": {
-        "dev": "tsx watch src/server.ts",
-        "start": "node dist/server.js",
-        "build": "tsc"
-    },
-    "dependencies": {
-        "cors": "^2.8.5",
-        "dotenv": "^16.6.1",
-        "express": "^4.18.2",
-        "pg": "^8.11.3"
-    },
-    "devDependencies": {
-        "@types/express": "^4.17.21",
-        "@types/node": "^20.10.6",
-        "@types/pg": "^8.11.3",
-        "tsx": "^4.7.0",
-        "typescript": "^5.9.2"
-    }
+  "name": "@meetlog/api",
+  "version": "1.0.0",
+  "description": "MeetLog API Server",
+  "license": "ISC",
+  "author": "Julien",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "expo-file-system": "~19.0.21",
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^20.10.6",
+    "@types/pg": "^8.11.3",
+    "tsx": "^4.7.0",
+    "typescript": "^5.9.2"
+  }
 }

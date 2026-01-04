@@ -1,51 +1,50 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-
-interface MeetingNote {
-    id: string;
-    title: string;
-    date: string;
-    summary: string;
-    duration: string;
-}
-
-// TODO: Remplacer par appel API
-const MOCK_NOTES: Record<string, MeetingNote> = {
-    "1": {
-        id: "1",
-        title: "Stand-up Sprint 15",
-        date: "06/02/2026",
-        summary:
-            "Discussion sur les tâches en cours, blocages identifiés sur l'API. Les points soulevés : amélioration de la performance du serveur, refactorisation du code legacy...",
-        duration: "15 min",
-    },
-    "2": {
-        id: "2",
-        title: "Réunion planning Sprint 16",
-        date: "27/01/2026",
-        summary:
-            "Définition des objectifs du prochain sprint, priorisation des features. Nouvelles features : intégration IA, amélioration UX...",
-        duration: "45 min",
-    },
-    "3": {
-        id: "3",
-        title: "Retro Sprint 14",
-        date: "14/01/2026",
-        summary:
-            "Analyse des points d'amélioration, célébration des réussites. À améliorer : communication interne, planning plus réaliste...",
-        duration: "30 min",
-    },
-};
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { getNoteById, type Note } from "./lib/api";
 
 export default function NoteDetail() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
-    const note = id ? MOCK_NOTES[id as string] : null;
+    const [note, setNote] = useState<Note | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    if (!note) {
+    useEffect(() => {
+        const loadNote = async () => {
+            if (!id) {
+                setError("ID de note manquant");
+                setLoading(false);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                setError(null);
+                const fetchedNote = await getNoteById(Number(id));
+                setNote(fetchedNote);
+            } catch (err) {
+                setError("Erreur lors du chargement de la note");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadNote();
+    }, [id]);
+
+    if (loading) {
         return (
             <View style={styles.container}>
-                <Text style={styles.errorText}>Note introuvable</Text>
+                <ActivityIndicator size="large" color="#0a7ea4" />
+            </View>
+        );
+    }
+
+    if (error || !note) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.errorText}>{error || "Note introuvable"}</Text>
             </View>
         );
     }
@@ -53,14 +52,13 @@ export default function NoteDetail() {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.content}>
-                <Text style={styles.title}>{note.title}</Text>
-                <Text style={styles.date}>{note.date}</Text>
-                <Text style={styles.duration}>Durée: {note.duration}</Text>
+                <Text style={styles.title}>Note {note.id_record}</Text>
+                <Text style={styles.date}>{new Date(note.created_at).toLocaleDateString("fr-FR")}</Text>
 
                 <View style={styles.divider} />
 
-                <Text style={styles.summaryTitle}>Résumé</Text>
-                <Text style={styles.summary}>{note.summary}</Text>
+                <Text style={styles.summaryTitle}>Contenu</Text>
+                <Text style={styles.summary}>{note.content}</Text>
             </ScrollView>
         </View>
     );
