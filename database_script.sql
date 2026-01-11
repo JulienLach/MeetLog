@@ -40,16 +40,6 @@ CREATE INDEX idx_notes_user ON notes(id_user);
 CREATE INDEX idx_records_created ON records(created_at DESC);
 CREATE INDEX idx_notes_created ON notes(created_at DESC);
 
--- Données de démonstration
+-- User de test
 INSERT INTO users (first_name, last_name, email, password) VALUES
 ('Jean', 'Dupont', 'test@gmail.com', 'test');
-
-INSERT INTO records (id_user, title, duration, file_uri, file_size, status) VALUES
-(1, 'Stand-up Sprint 15', 900, 'audio/standup_001.mp3', 22500000, 'completed'),
-(1, 'Réunion planning Sprint 16', 1800, 'audio/review_001.mp3', 45000000, 'completed'),
-(1, 'Retro Sprint 14', 2400, 'audio/arch_001.mp3', 60000000, 'processing');
-
-INSERT INTO notes (id_record, id_user, content) VALUES
-(1, 1, 'À FAIRE: Corriger le timeout endpoint login, optimiser requêtes DB pour liste utilisateurs, refactoriser middleware authentification'),
-(2, 1, 'ACTION: Jean doit déboguer le bug OAuth2, reviewer PR #324 avant vendredi'),
-(3, 1, 'BUGS TROUVÉS: Validation formulaire incohérente, fuite mémoire handler websocket, race condition en pagination'),

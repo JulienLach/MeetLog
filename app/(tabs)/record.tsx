@@ -3,7 +3,7 @@ import { Audio } from "expo-av";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { createNote, createRecord } from "../lib/api";
+import { createNote, createRecord } from "../../lib/api";
 
 export default function Record() {
     const router = useRouter();
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     },
     recordButton: {
         backgroundColor: "#424242",
-        paddingHorizontal: 15,
+        paddingHorizontal: 13,
         paddingVertical: 12,
         borderRadius: 10,
         flexDirection: "row",

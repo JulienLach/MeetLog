@@ -1,61 +1,52 @@
 import { Router } from "express";
-import { User } from "../models/User.js";
+import { User } from "../models/User";
 
 const router = Router();
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
     try {
         const users = await User.getAllUsers();
         res.json(users);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch users" });
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
     try {
         const user = await User.getUserById(Number(req.params.id));
-        if (!user) return res.status(404).json({ error: "User not found" });
         res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch user" });
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
     try {
         const { first_name, last_name, email, password } = req.body;
-        if (!first_name || !last_name || !email || !password) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
         const user = await User.createUser(first_name, last_name, email, password);
         res.status(201).json(user);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to create user" });
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
     try {
         const { first_name, last_name, email } = req.body;
-        if (!first_name || !last_name || !email) {
-            return res.status(400).json({ error: "Missing required fields" });
-        }
         const user = await User.updateUser(Number(req.params.id), first_name, last_name, email);
-        if (!user) return res.status(404).json({ error: "User not found" });
         res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update user" });
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
     try {
-        const deleted = await User.deleteUser(Number(req.params.id));
-        if (!deleted) return res.status(404).json({ error: "User not found" });
+        await User.deleteUser(Number(req.params.id));
         res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: "Failed to delete user" });
+    } catch (error: any) {
+        next(error);
     }
 });
 

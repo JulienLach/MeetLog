@@ -1,14 +1,16 @@
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { getAllNotes, type Note } from "../lib/api";
+import { getAllNotes, getRecordById } from "../../lib/api";
+import { MeetingNote, Note } from "../../lib/interfaces/interfaces";
 
-interface MeetingNote {
-    id: string;
-    title: string;
-    date: string;
-    summary: string;
-    duration: string;
+/**
+ * Formate les secondes en "Xm Ys"
+ */
+function formatDuration(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
 }
 
 export default function Index() {
@@ -28,13 +30,24 @@ export default function Index() {
             setLoading(true);
             setError(null);
             const notes: Note[] = await getAllNotes(1);
-            const mappedNotes: MeetingNote[] = notes.map((note) => ({
-                id: note.id_note.toString(),
-                title: `Note ${note.id_record}`,
-                date: new Date(note.created_at).toLocaleDateString("fr-FR"),
-                summary: note.content,
-                duration: "",
-            }));
+            const mappedNotes: MeetingNote[] = await Promise.all(
+                notes.map(async (note) => {
+                    let duration = "";
+                    try {
+                        const record = await getRecordById(note.id_record);
+                        duration = formatDuration(record.duration);
+                    } catch (err) {
+                        console.error("Erreur lors du chargement de la durée:", err);
+                    }
+                    return {
+                        id: note.id_note.toString(),
+                        title: `Note ${note.id_record}`,
+                        date: new Date(note.created_at).toLocaleDateString("fr-FR"),
+                        summary: note.content,
+                        duration,
+                    };
+                })
+            );
             setMeetingNotes(mappedNotes);
         } catch (err) {
             setError("Erreur lors du chargement des notes");
@@ -54,7 +67,7 @@ export default function Index() {
                 {item.summary}
             </Text>
             <View style={styles.noteFooter}>
-                <Text style={styles.noteDuration}>Durée: {item.duration}</Text>
+                <Text style={styles.noteDuration}>Durée : {item.duration}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -171,7 +184,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 18,
-        fontWeight: "600",
+        fontWeight: "500",
         color: "#666",
         textAlign: "center",
         marginBottom: 8,
@@ -186,12 +199,12 @@ const styles = StyleSheet.create({
         marginTop: 20,
         paddingHorizontal: 20,
         paddingVertical: 12,
-        backgroundColor: "#0a7ea4",
+        backgroundColor: "#ee4545",
         borderRadius: 8,
     },
     retryText: {
         color: "white",
         fontSize: 16,
-        fontWeight: "600",
+        fontWeight: "500",
     },
 });

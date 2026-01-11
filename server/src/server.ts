@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import notesRouter from "./routes/notes.routes.js";
-import recordsRouter from "./routes/records.routes.js";
-import usersRouter from "./routes/users.routes.js";
+import notesRouter from "./routes/notes.routes";
+import recordsRouter from "./routes/records.routes";
+import usersRouter from "./routes/users.routes";
 // Initialize audio processor worker
 import "./workers/audioProcessor.worker.js";
 
@@ -28,5 +28,4 @@ app.use("/api/notes", notesRouter);
 
 app.listen(PORT_BACKEND, () => {
     console.log(`Server is running on ${SERVER_URL}`);
-    console.log(`Server accessible on network at http://192.168.1.14:${PORT_BACKEND}`);
 });

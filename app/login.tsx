@@ -20,7 +20,7 @@ export default function Login() {
     return (
         <View style={styles.container}>
             <View style={styles.logoContainer}>
-                <Ionicons name="mic" size={48} color="#424242" />
+                <Ionicons name="mic" size={45} color="#424242" />
                 <Text style={styles.logo}>MeetLog</Text>
             </View>
             <Text style={styles.subtitle}>Synthétisez vos réunions</Text>
@@ -53,13 +53,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#f5f5f5",
-        padding: 20,
+        padding: 30,
     },
     logoContainer: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 10,
-        gap: 12,
+        gap: 5,
     },
     logo: {
         fontSize: 42,

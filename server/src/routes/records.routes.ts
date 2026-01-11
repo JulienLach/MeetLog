@@ -1,130 +1,104 @@
-import { Router } from "express";
+import express from "express";
 import multer from "multer";
 import path from "path";
-import {
-    createRecord,
-    deleteRecord,
-    getAllRecords,
-    getRecordById,
-    getRecordsByStatus,
-    getRecordsByUserId,
-    updateRecord,
-    updateRecordStatus,
-} from "../services/records.services.js";
-import { queueAudioProcessing } from "../workers/audioProcessor.worker.js";
+import { Record } from "../models/Record";
+import { queueAudioProcessing } from "../workers/audioProcessor.worker";
 
-const router = Router();
+const router = express.Router();
 
-// Configuration de multer pour le stockage des fichiers
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/");
-    },
+    destination: (req, file, cb) => cb(null, "uploads/"),
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
         cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
     },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
     try {
         const { user_id, status } = req.query;
-        let records;
-
-        if (user_id) {
-            records = await getRecordsByUserId(Number(user_id));
-        } else if (status) {
-            records = await getRecordsByStatus(String(status));
-        } else {
-            records = await getAllRecords();
-        }
-
-        res.json(records);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch records" });
+        const records = user_id
+            ? await Record.getRecordsByUserId(Number(user_id))
+            : status
+            ? await Record.getRecordsByStatus(String(status))
+            : await Record.getAllRecords();
+        res.status(200).json(records);
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
     try {
-        const record = await getRecordById(Number(req.params.id));
-        if (!record) return res.status(404).json({ error: "Record not found" });
-        res.json(record);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch record" });
+        const id = parseInt(req.params.id);
+        const record = await Record.getRecordById(id);
+        res.status(200).json(record);
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.get("/:id/status", async (req, res) => {
+router.get("/:id/status", async (req, res, next) => {
     try {
-        const record = await getRecordById(Number(req.params.id));
-        if (!record) {
-            return res.status(404).json({ error: "Record not found" });
-        }
-
-        res.json({
-            id: record.id_record,
-            status: record.status,
-            error_message: record.error_message || null,
-            has_transcription: !!record.transcription,
+        const id = parseInt(req.params.id);
+        const record = await Record.getRecordById(id);
+        res.status(200).json({
+            id: record?.id_record,
+            status: record?.status,
+            error_message: record?.error_message || null,
+            has_transcription: !!record?.transcription,
         });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch record status" });
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.post("/", upload.single("audio"), async (req, res) => {
+router.post("/", upload.single("audio"), async (req, res, next) => {
     try {
         const { id_user, title, duration } = req.body;
         const file = req.file;
 
         if (!id_user || !title || !file) {
-            return res.status(400).json({ error: "Missing required fields or file" });
+            res.status(400).json({ error: "Missing required fields or file" });
+            return;
         }
 
-        // L'URL du fichier sera accessible via le serveur
-        const file_uri = `/uploads/${file.filename}`;
-        const file_size = file.size;
-
-        const record = await createRecord(Number(id_user), title, Number(duration) || 0, file_uri, file_size);
-
-        // Queue audio processing job (asynchronous)
+        const record = await Record.createRecord(
+            Number(id_user),
+            title,
+            Number(duration) || 0,
+            `/uploads/${file.filename}`,
+            file.size
+        );
         await queueAudioProcessing(record.id_record);
-
         res.status(201).json(record);
-    } catch (error) {
-        console.error("Error creating record:", error);
-        res.status(500).json({ error: "Failed to create record" });
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
     try {
+        const id = parseInt(req.params.id);
         const { title, duration, status } = req.body;
-        let record;
-
-        if (status) {
-            record = await updateRecordStatus(Number(req.params.id), status);
-        } else {
-            record = await updateRecord(Number(req.params.id), title, duration);
-        }
-
-        if (!record) return res.status(404).json({ error: "Record not found" });
-        res.json(record);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update record" });
+        const record = status
+            ? await Record.updateRecordStatus(id, status)
+            : await Record.updateRecord(id, title, duration);
+        res.status(200).json(record);
+    } catch (error: any) {
+        next(error);
     }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
     try {
-        const deleted = await deleteRecord(Number(req.params.id));
-        if (!deleted) return res.status(404).json({ error: "Record not found" });
+        const id = parseInt(req.params.id);
+        await Record.deleteRecord(id);
         res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: "Failed to delete record" });
+    } catch (error: any) {
+        next(error);
     }
 });
 

@@ -1,7 +1,8 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
-import { getNoteById, type Note } from "./lib/api";
+import { getNoteById } from "../lib/api";
+import { Note } from "../lib/interfaces/interfaces";
 
 export default function NoteDetail() {
     const { id } = useLocalSearchParams();
@@ -35,7 +36,7 @@ export default function NoteDetail() {
     if (loading) {
         return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color="#0a7ea4" />
+                <ActivityIndicator size="small" color="#373737" />
             </View>
         );
     }

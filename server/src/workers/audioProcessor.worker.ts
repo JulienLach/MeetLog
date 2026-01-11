@@ -1,5 +1,5 @@
-import { audioQueue, AudioProcessingJob } from '../config/queue.config.js';
-import { processAudioRecord } from '../services/audioProcessing.service.js';
+import { audioQueue, AudioProcessingJob } from '../config/queue.config';
+import { processAudioRecord } from '../services/audioProcessing.service';
 
 /**
  * Adds an audio processing job to the queue
@@ -18,7 +18,7 @@ export async function queueAudioProcessing(recordId: number): Promise<void> {
             console.error(`✗ Job failed for record ${recordId}:`, error.message);
             // Error is already logged in processAudioRecord
             // and database is already updated with error status
-            throw error; // Re-throw to mark job as failed
+            // Don't re-throw - handle gracefully to prevent server crash
         }
     });
 
