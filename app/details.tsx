@@ -23,7 +23,7 @@ export default function NoteDetail() {
                 setError(null);
                 const fetchedNote = await getNoteById(Number(id));
                 setNote(fetchedNote);
-            } catch (err) {
+            } catch {
                 setError("Erreur lors du chargement de la note");
             } finally {
                 setLoading(false);

@@ -22,8 +22,8 @@ export default function Record() {
                     allowsRecordingIOS: true,
                     playsInSilentModeIOS: true,
                 });
-            } catch (err) {
-                console.error("Erreur lors de la configuration audio:", err);
+            } catch (error) {
+                console.error("Erreur lors de la configuration audio:", error);
             }
         };
 
@@ -84,8 +84,8 @@ export default function Record() {
                     setRecordingTime((prev) => prev + 1);
                 }, 1000);
             }
-        } catch (err) {
-            console.error("Erreur lors de l'enregistrement:", err);
+        } catch (error) {
+            console.error("Erreur lors de l'enregistrement:", error);
             Alert.alert("Erreur", "Impossible de démarrer l'enregistrement");
         }
     };
@@ -111,7 +111,7 @@ export default function Record() {
                 <View style={styles.recordingContainer}>
                     <View style={styles.recordingIndicator}>
                         <View style={styles.recordingDot} />
-                        <Text style={styles.recordingText}>En cours d'enregistrement</Text>
+                        <Text style={styles.recordingText}>En cours d&apos;enregistrement</Text>
                     </View>
                     <Text style={styles.recordingTime}>{formatTime(recordingTime)}</Text>
                     <TouchableOpacity style={styles.stopButton} onPress={handleRecord}>

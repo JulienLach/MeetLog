@@ -36,8 +36,8 @@ export default function Index() {
                     try {
                         const record = await getRecordById(note.id_record);
                         duration = formatDuration(record.duration);
-                    } catch (err) {
-                        console.error("Erreur lors du chargement de la durée:", err);
+                    } catch (error) {
+                        console.error("Erreur lors du chargement de la durée:", error);
                     }
                     return {
                         id: note.id_note.toString(),
@@ -49,9 +49,9 @@ export default function Index() {
                 })
             );
             setMeetingNotes(mappedNotes);
-        } catch (err) {
+        } catch (error) {
             setError("Erreur lors du chargement des notes");
-            console.error(err);
+            console.error(error);
         } finally {
             setLoading(false);
         }
@@ -98,7 +98,7 @@ export default function Index() {
             {meetingNotes.length === 0 ? (
                 <View style={styles.emptyState}>
                     <Text style={styles.emptyText}>Aucune note de réunion enregistrée</Text>
-                    <Text style={styles.emptySubtext}>Utilisez l'onglet Notes pour commencer un enregistrement</Text>
+                    <Text style={styles.emptySubtext}>Utilisez l&apos;onglet Notes pour commencer un enregistrement</Text>
                 </View>
             ) : (
                 <FlatList
