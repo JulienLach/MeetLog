@@ -15,10 +15,10 @@ Capture, transcribe, and summarize developer standup meetings in real-time with 
 
 MeetLog is a full-stack application for recording meeting audio, transcribing it automatically with Whisper.cpp, and generating structured summaries with Ollama LLM. Perfect for sprint meetings, stand-ups, and team discussions.
 
-**Two-model pipeline:**
+Two-model pipeline :
 
--   **Whisper.cpp** : Transcribes audio to text (offline, no API calls)
--   **Ollama** : Generates summaries from transcriptions (local LLM)
+-   Whisper.cpp : Transcribes audio to text (offline, no API calls)
+-   Ollama : Generates summaries from transcriptions (local downloaded small LLM)
 
 ## Features
 
