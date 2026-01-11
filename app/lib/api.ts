@@ -37,12 +37,7 @@ export interface Record {
     updated_at: string;
 }
 
-export async function createRecord(
-    userId: number,
-    title: string,
-    duration: number,
-    fileUri: string
-): Promise<Record> {
+export async function createRecord(userId: number, title: string, duration: number, fileUri: string): Promise<Record> {
     const formData = new FormData();
     formData.append("id_user", userId.toString());
     formData.append("title", title);
@@ -60,7 +55,6 @@ export async function createRecord(
         body: formData,
         headers: {
             Accept: "application/json",
-            // Ne pas mettre Content-Type, fetch le fera avec le boundary pour FormData
         },
     });
 

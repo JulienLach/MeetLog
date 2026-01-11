@@ -1,10 +1,9 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { getNoteById, type Note } from "./lib/api";
 
 export default function NoteDetail() {
-    const router = useRouter();
     const { id } = useLocalSearchParams();
     const [note, setNote] = useState<Note | null>(null);
     const [loading, setLoading] = useState(true);

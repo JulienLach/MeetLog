@@ -17,6 +17,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 -   Dynamic note loading from backend
 -   Audio recording save functionality with API integration
 -   File upload support with multer
+-   Audio transcription service with Whisper.cpp integration
+-   AI-powered summarization service using Ollama (llama3.2:3b)
+-   Asynchronous audio processing pipeline with p-queue
+-   Queue worker system for background audio processing
+-   Record status tracking (pending, processing, completed, error)
+-   Transcription field in records model
 
 ### Changed
 

@@ -11,6 +11,7 @@ import {
     updateRecord,
     updateRecordStatus,
 } from "../services/records.services.js";
+import { queueAudioProcessing } from "../workers/audioProcessor.worker.js";
 
 const router = Router();
 
@@ -56,6 +57,24 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+router.get("/:id/status", async (req, res) => {
+    try {
+        const record = await getRecordById(Number(req.params.id));
+        if (!record) {
+            return res.status(404).json({ error: "Record not found" });
+        }
+
+        res.json({
+            id: record.id_record,
+            status: record.status,
+            error_message: record.error_message || null,
+            has_transcription: !!record.transcription,
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch record status" });
+    }
+});
+
 router.post("/", upload.single("audio"), async (req, res) => {
     try {
         const { id_user, title, duration } = req.body;
@@ -69,13 +88,11 @@ router.post("/", upload.single("audio"), async (req, res) => {
         const file_uri = `/uploads/${file.filename}`;
         const file_size = file.size;
 
-        const record = await createRecord(
-            Number(id_user),
-            title,
-            Number(duration) || 0,
-            file_uri,
-            file_size
-        );
+        const record = await createRecord(Number(id_user), title, Number(duration) || 0, file_uri, file_size);
+
+        // Queue audio processing job (asynchronous)
+        await queueAudioProcessing(record.id_record);
+
         res.status(201).json(record);
     } catch (error) {
         console.error("Error creating record:", error);

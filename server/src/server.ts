@@ -6,6 +6,8 @@ import { fileURLToPath } from "url";
 import notesRouter from "./routes/notes.routes.js";
 import recordsRouter from "./routes/records.routes.js";
 import usersRouter from "./routes/users.routes.js";
+// Initialize audio processor worker
+import "./workers/audioProcessor.worker.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });

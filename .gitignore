@@ -48,3 +48,9 @@ app-example
 
 # Claude
 .claude
+
+# Uploads
+uploads/
+
+# Whisper.cpp models
+server/whisper-cpp/

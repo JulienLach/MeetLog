@@ -8,6 +8,8 @@ export interface Record {
     file_uri: string;
     file_size: number;
     status: "pending" | "processing" | "completed" | "error";
+    transcription?: string;
+    error_message?: string;
     created_at: Date;
     updated_at: Date;
 }
