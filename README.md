@@ -52,7 +52,25 @@ npm install
 cd server && npm install
 ```
 
-### 3. Compile Whisper.cpp (if needed)
+### 3. Install Whisper.cpp
+
+```bash
+cd server
+git clone https://github.com/ggerganov/whisper.cpp.git
+cd whisper.cpp
+make
+cd ../..
+```
+
+Then download a model:
+
+```bash
+cd server/whisper-cpp/models
+bash download-ggml-model.sh base
+cd ../../..
+```
+
+### 4. Compile Whisper.cpp (if needed after updates)
 
 ```bash
 cd server/whisper-cpp
@@ -60,7 +78,7 @@ make
 cd ../..
 ```
 
-### 4. Start Services
+### 5. Start Services
 
 **Terminal 1 - Start Ollama:**
 
